@@ -6,6 +6,8 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+const PreloadWebpackPlugin = require("@vue/preload-webpack-plugin");
+const WorkboxPlugin = require("workbox-webpack-plugin");
 
 // cpu核数
 const threads = os.cpus().length;
@@ -145,6 +147,17 @@ module.exports = {
         }),
         // css压缩
         // new CssMinimizerPlugin(),
+        new PreloadWebpackPlugin({
+            rel: "preload", // preload兼容性更好
+            as: "script",
+            // rel: 'prefetch' // prefetch兼容性更差
+        }),
+        new WorkboxPlugin.GenerateSW({
+            // 这些选项帮助快速启用 ServiceWorkers
+            // 不允许遗留任何“旧的” ServiceWorkers
+            clientsClaim: true,
+            skipWaiting: true,
+        }),
     ],
     optimization: {
         minimizer: [
@@ -222,6 +235,10 @@ module.exports = {
                 },
             },
         },
+    },
+    // 提取runtime文件
+    runtimeChunk: {
+        name: (entrypoint) => `runtime~${entrypoint.name}`, // runtime文件命名规则
     },
     devServer: {
         // static: './dist',
