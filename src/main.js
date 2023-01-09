@@ -4,6 +4,7 @@ import "./less/index.less"
 import "./sass/index.scss"
 import "../src/css/iconfont.css"
 import { add } from "../src/js/math"
+import "core-js";
 console.log(count(1, 2));
 
 console.log(sum(1, 2, 3, 4));
@@ -20,3 +21,16 @@ document.getElementById("btn").onclick = function() {
             console.log("模块加载失败", err);
         });
 };
+
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker
+            .register("/service-worker.js")
+            .then((registration) => {
+                console.log("SW registered: ", registration);
+            })
+            .catch((registrationError) => {
+                console.log("SW registration failed: ", registrationError);
+            });
+    });
+}
